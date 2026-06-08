@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JavaScript за 1 месяц — интенсив от нуля до первого проекта</title>
+<meta name="description" content="Интенсив «JavaScript за 30 дней»: 4 недели, теория + практика в песочнице. От переменных до выпускного проекта.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ПЕРЕМЕННЫЕ / ДИЗАЙН-ТОКЕНЫ
+   ============================================================ */
+:root{
+  /* фон — как в редакторе кода */
+  --bg:#0a0e16;
+  --bg-elev:#111824;
+  --bg-elev-2:#161f2e;
+  --bg-input:#0d1420;
+
+  --border:#222d3e;
+  --border-bright:#324155;
+
+  --text:#e7eef6;
+  --text-dim:#94a3b6;
+  --text-faint:#5b6878;
+
+  /* акценты — подсветка синтаксиса */
+  --js:#f7df1e;          /* фирменный жёлтый JS — главный акцент */
+  --js-deep:#d8c011;
+  --cyan:#56d4dd;
+  --blue:#58a6ff;
+  --green:#7ee787;
+  --red:#ff7b72;
+  --purple:#d2a8ff;
+  --orange:#ffa657;
+
+  --font-display:'Sora',-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-body:'Manrope',-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-mono:'JetBrains Mono','SF Mono',ui-monospace,monospace;
+
+  --radius:14px;
+  --radius-sm:9px;
+  --maxw:1160px;
+  --shadow:0 24px 60px -20px rgba(0,0,0,.7);
+  --glow-js:0 0 0 1px rgba(247,223,30,.35),0 14px 40px -8px rgba(247,223,30,.35);
+}
+
+/* ============================================================
+   СБРОС
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+  font-size:16px;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+ul{list-style:none}
+section{scroll-margin-top:76px}
+
+/* атмосфера: мягкие световые пятна + сетка */
+body::before{
+  content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(700px 500px at 80% -5%,rgba(247,223,30,.10),transparent 60%),
+    radial-gradient(700px 600px at 5% 8%,rgba(86,212,221,.09),transparent 55%),
+    radial-gradient(900px 700px at 50% 110%,rgba(88,166,255,.07),transparent 60%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.35;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:46px 46px;
+  -webkit-mask-image:radial-gradient(circle at 50% 30%,#000,transparent 78%);
+          mask-image:radial-gradient(circle at 50% 30%,#000,transparent 78%);
+}
+
+.container{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 20px}
+
+/* ============================================================
+   ОБЩЕЕ: метки, заголовки, кнопки
+   ============================================================ */
+.eyebrow{
+  font-family:var(--font-mono);font-size:.8rem;letter-spacing:.04em;
+  color:var(--cyan);display:inline-flex;align-items:center;gap:.5em;margin-bottom:1rem;
+}
+.eyebrow::before{content:"//";color:var(--js);font-weight:700}
+
+.section-head{max-width:680px;margin-bottom:2.6rem}
+h2.section-title{
+  font-family:var(--font-display);font-weight:800;line-height:1.1;letter-spacing:-.02em;
+  font-size:clamp(1.7rem,5vw,2.7rem);margin-bottom:.7rem;
+}
+.section-sub{color:var(--text-dim);font-size:clamp(1rem,2.4vw,1.12rem)}
+.accent{color:var(--js)}
+.accent-c{color:var(--cyan)}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:.55em;
+  font-family:var(--font-display);font-weight:700;font-size:.98rem;
+  padding:.92em 1.5em;border-radius:var(--radius-sm);
+  transition:transform .18s ease,box-shadow .25s ease,background .2s ease,border-color .2s;
+  white-space:nowrap;
+}
+.btn-primary{background:var(--js);color:#0a0e16;box-shadow:var(--glow-js)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 0 1px rgba(247,223,30,.5),0 20px 50px -10px rgba(247,223,30,.55)}
+.btn-ghost{background:transparent;border:1px solid var(--border-bright);color:var(--text)}
+.btn-ghost:hover{border-color:var(--js);color:var(--js);transform:translateY(-2px)}
+.btn-block{width:100%}
+
+/* ============================================================
+   ХЕДЕР
+   ============================================================ */
+header.site{
+  position:sticky;top:0;z-index:50;
+  background:rgba(10,14,22,.72);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px;gap:1rem}
+.logo{display:flex;align-items:center;gap:.6rem;font-family:var(--font-display);font-weight:800;font-size:1.05rem;letter-spacing:-.01em}
+.logo-mark{
+  width:34px;height:34px;border-radius:9px;display:grid;place-items:center;
+  background:var(--js);color:#0a0e16;font-family:var(--font-mono);font-weight:700;font-size:.95rem;
+  box-shadow:0 6px 18px -6px rgba(247,223,30,.6);
+}
+.logo b{color:var(--js)}
+.nav-links{display:none;align-items:center;gap:1.7rem}
+.nav-links a{font-size:.92rem;color:var(--text-dim);font-weight:600;transition:color .18s;position:relative}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-links a.active::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:var(--js);border-radius:2px}
+.nav-cta{display:none}
+.burger{display:flex;flex-direction:column;gap:5px;padding:8px;border-radius:8px;border:1px solid var(--border)}
+.burger span{width:22px;height:2px;background:var(--text);border-radius:2px;transition:.25s}
+.burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger.open span:nth-child(2){opacity:0}
+.burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+.mobile-menu{
+  display:none;flex-direction:column;gap:.2rem;padding:.6rem 20px 1.1rem;
+  border-bottom:1px solid var(--border);background:rgba(10,14,22,.95);
+}
+.mobile-menu.open{display:flex}
+.mobile-menu a{padding:.7rem .2rem;color:var(--text-dim);font-weight:600;border-bottom:1px solid var(--border)}
+.mobile-menu a:last-of-type{border-bottom:none}
+.mobile-menu .btn{margin-top:.7rem}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{position:relative;padding:clamp(2.6rem,8vw,5rem) 0 clamp(2.4rem,6vw,4rem)}
+.hero-grid{display:grid;gap:2.8rem;align-items:center}
+.hero h1{
+  font-family:var(--font-display);font-weight:800;letter-spacing:-.025em;line-height:1.06;
+  font-size:clamp(2.1rem,7.2vw,3.7rem);margin-bottom:1.2rem;
+}
+.hero h1 .hl{color:var(--js);text-shadow:0 0 38px rgba(247,223,30,.35)}
+.hero h1 .hl2{color:var(--cyan)}
+.hero p.lead{color:var(--text-dim);font-size:clamp(1.02rem,2.6vw,1.2rem);max-width:540px;margin-bottom:1.9rem}
+.hero-cta{display:flex;flex-wrap:wrap;gap:.85rem;margin-bottom:2.2rem}
+.hero-meta{display:flex;flex-wrap:wrap;gap:1.4rem;color:var(--text-faint);font-family:var(--font-mono);font-size:.82rem}
+.hero-meta span{display:inline-flex;align-items:center;gap:.5em}
+.hero-meta b{color:var(--text);font-weight:500}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+
+/* окно редактора кода */
+.editor{
+  background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;position:relative;
+}
+.editor::after{content:"";position:absolute;inset:0;border-radius:var(--radius);pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);}
+.editor-bar{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;border-bottom:1px solid var(--border);background:var(--bg-elev-2)}
+.tl{display:flex;gap:.45rem}
+.tl i{width:12px;height:12px;border-radius:50%;display:block}
+.tl i:nth-child(1){background:#ff5f57}.tl i:nth-child(2){background:#febc2e}.tl i:nth-child(3){background:#28c840}
+.editor-file{font-family:var(--font-mono);font-size:.78rem;color:var(--text-faint);margin-left:.4rem}
+.editor-file b{color:var(--text-dim);font-weight:400}
+.code{font-family:var(--font-mono);font-size:.82rem;line-height:1.85;padding:1.1rem 1.1rem 1.3rem;overflow-x:auto}
+.code .ln{counter-reset:line}
+.code .row{display:block;white-space:pre}
+.code .row::before{
+  counter-increment:line;content:counter(line);
+  display:inline-block;width:1.7em;margin-right:1.1em;color:var(--text-faint);text-align:right;opacity:.65;
+}
+.k{color:var(--purple)}    /* ключевое слово */
+.s{color:var(--green)}     /* строка */
+.f{color:var(--blue)}      /* функция */
+.n{color:var(--orange)}    /* число */
+.c{color:var(--text-faint);font-style:italic} /* комментарий */
+.p{color:var(--text-dim)}  /* пунктуация */
+.cursor{display:inline-block;width:8px;height:1.05em;background:var(--js);vertical-align:text-bottom;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* счётчик / дедлайн */
+.countdown{
+  margin-top:1.6rem;border:1px dashed var(--border-bright);border-radius:var(--radius);
+  padding:1rem 1.1rem;background:linear-gradient(180deg,rgba(247,223,30,.05),transparent);
+}
+.countdown .cd-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem}
+.countdown .cd-label{font-family:var(--font-mono);font-size:.78rem;color:var(--text-dim)}
+.countdown .cd-date{font-family:var(--font-mono);font-size:.78rem;color:var(--js);font-weight:700}
+.cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;text-align:center}
+.cd-cell{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.7rem .2rem}
+.cd-num{font-family:var(--font-mono);font-weight:700;font-size:clamp(1.3rem,5vw,1.8rem);color:var(--text);line-height:1}
+.cd-unit{font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-top:.35rem;font-family:var(--font-mono)}
+
+/* ============================================================
+   ФОРМАТ (теория + практика)
+   ============================================================ */
+.format{padding:clamp(3rem,8vw,5rem) 0}
+.flow{display:grid;gap:1rem;margin-bottom:2.4rem}
+.flow-step{
+  position:relative;background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.5rem 1.4rem;transition:.3s;overflow:hidden;
+}
+.flow-step .num{font-family:var(--font-mono);font-size:.8rem;color:var(--text-faint)}
+.flow-step .ico{font-size:1.7rem;margin:.5rem 0 .7rem;display:block}
+.flow-step h3{font-family:var(--font-display);font-weight:700;font-size:1.12rem;margin-bottom:.4rem}
+.flow-step p{color:var(--text-dim);font-size:.93rem}
+.flow-step.active{border-color:var(--js);box-shadow:0 0 0 1px rgba(247,223,30,.25),0 18px 40px -16px rgba(247,223,30,.3);transform:translateY(-4px)}
+.flow-step.active .num{color:var(--js)}
+.flow-arrow{display:none}
+
+.bullets{display:grid;gap:1rem}
+.bul{display:flex;gap:.9rem;background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.2rem;transition:.25s}
+.bul:hover{border-color:var(--border-bright);transform:translateY(-3px)}
+.bul .bi{font-family:var(--font-mono);color:var(--js);font-weight:700;flex-shrink:0}
+.bul b{display:block;font-family:var(--font-display);font-weight:700;margin-bottom:.15rem}
+.bul span{color:var(--text-dim);font-size:.92rem}
+
+/* ============================================================
+   ПРОГРАММА (4 недели)
+   ============================================================ */
+.program{padding:clamp(3rem,8vw,5rem) 0}
+.tabs{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.4rem;margin-bottom:1.8rem;-ms-overflow-style:none;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;
+  border:1px solid var(--border);border-radius:var(--radius-sm);padding:.7rem 1.1rem;background:var(--bg-elev);
+  transition:.22s;min-width:128px;
+}
+.tab .tw{font-family:var(--font-mono);font-size:.72rem;color:var(--text-faint)}
+.tab .tt{font-family:var(--font-display);font-weight:700;font-size:.95rem;color:var(--text-dim)}
+.tab:hover{border-color:var(--border-bright)}
+.tab.active{background:var(--js);border-color:var(--js)}
+.tab.active .tw{color:rgba(10,14,22,.65)}
+.tab.active .tt{color:#0a0e16}
+
+.panel{display:none;animation:fade .4s ease}
+.panel.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.block-head{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.4rem;flex-wrap:wrap}
+.block-badge{font-family:var(--font-mono);font-weight:700;font-size:.8rem;color:var(--js);border:1px solid var(--border-bright);border-radius:8px;padding:.45rem .7rem;background:var(--bg-elev);flex-shrink:0}
+.block-head h3{font-family:var(--font-display);font-weight:800;font-size:clamp(1.3rem,4vw,1.7rem);line-height:1.15}
+.block-head p{color:var(--text-dim);font-size:.96rem;margin-top:.35rem;width:100%}
+
+/* аккордеон тем */
+.acc{display:grid;gap:.6rem;margin-bottom:1.6rem}
+.acc-item{border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-elev);overflow:hidden}
+.acc-q{display:flex;align-items:center;gap:.8rem;width:100%;text-align:left;padding:1rem 1.1rem;font-family:var(--font-display);font-weight:600;font-size:1rem;transition:.2s}
+.acc-q:hover{background:var(--bg-elev-2)}
+.acc-q .qn{font-family:var(--font-mono);font-size:.78rem;color:var(--js);flex-shrink:0}
+.acc-q .chev{margin-left:auto;flex-shrink:0;transition:transform .3s;color:var(--text-faint)}
+.acc-item.open .chev{transform:rotate(180deg);color:var(--js)}
+.acc-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.acc-a .inner{padding:0 1.1rem 1.1rem;color:var(--text-dim);font-size:.92rem}
+.acc-a .inner .tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.8rem}
+.acc-a .tags span{font-family:var(--font-mono);font-size:.72rem;color:var(--cyan);border:1px solid var(--border);border-radius:6px;padding:.25rem .55rem;background:var(--bg-input)}
+
+/* зона практики в блоке */
+.practice-card{
+  border:1px solid var(--border-bright);border-radius:var(--radius);padding:1.3rem 1.3rem;
+  background:linear-gradient(135deg,rgba(126,231,135,.06),rgba(86,212,221,.04));
+  display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap;
+}
+.practice-card .pico{font-size:1.5rem}
+.practice-card .pc-body{flex:1;min-width:200px}
+.practice-card .pc-tag{font-family:var(--font-mono);font-size:.72rem;color:var(--green);letter-spacing:.05em}
+.practice-card h4{font-family:var(--font-display);font-weight:700;font-size:1.08rem;margin:.25rem 0 .35rem}
+.practice-card p{color:var(--text-dim);font-size:.92rem}
+
+/* ============================================================
+   ПЕСОЧНИЦА
+   ============================================================ */
+.sandbox{padding:clamp(3rem,8vw,5rem) 0}
+.sb-wrap{display:grid;gap:1.4rem}
+.sb-task{
+  background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem 1.4rem;
+}
+.sb-task .pc-tag{font-family:var(--font-mono);font-size:.74rem;color:var(--cyan)}
+.sb-task h3{font-family:var(--font-display);font-weight:800;font-size:1.25rem;margin:.4rem 0 .8rem}
+.sb-task p{color:var(--text-dim);font-size:.95rem;margin-bottom:1rem}
+.sb-task .req{display:grid;gap:.55rem}
+.sb-task .req li{display:flex;gap:.6rem;font-size:.9rem;color:var(--text-dim)}
+.sb-task .req li::before{content:"›";color:var(--js);font-weight:700}
+.sb-task .hint{margin-top:1.1rem;font-family:var(--font-mono);font-size:.8rem;color:var(--text-faint);background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.7rem .8rem}
+.sb-task .hint b{color:var(--orange);font-weight:400}
+
+.sb-editor{background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column}
+.sb-editor .editor-bar .editor-file{margin-left:auto}
+.sb-code{
+  width:100%;min-height:230px;resize:vertical;border:none;outline:none;
+  background:var(--bg-input);color:var(--text);
+  font-family:var(--font-mono);font-size:.86rem;line-height:1.7;padding:1rem 1.1rem;tab-size:2;
+}
+.sb-code::placeholder{color:var(--text-faint)}
+.sb-actions{display:flex;gap:.7rem;align-items:center;padding:.85rem 1rem;border-top:1px solid var(--border);background:var(--bg-elev-2);flex-wrap:wrap}
+.sb-actions .reset{font-family:var(--font-mono);font-size:.8rem;color:var(--text-dim)}
+.sb-actions .reset:hover{color:var(--js)}
+.sb-out{
+  border-top:1px solid var(--border);padding:1rem 1.1rem;font-family:var(--font-mono);font-size:.83rem;
+  min-height:54px;color:var(--text-faint);line-height:1.7;
+}
+.sb-out.ok{color:var(--green);background:rgba(126,231,135,.05)}
+.sb-out.err{color:var(--red);background:rgba(255,123,114,.05)}
+.sb-out .ttl{font-weight:700;display:flex;align-items:center;gap:.5em;margin-bottom:.4rem}
+.sb-out .tcase{color:var(--text-dim);font-size:.78rem}
+.sb-out .tcase b{color:var(--green)}
+.sb-out .tcase i{color:var(--red);font-style:normal}
+
+/* ============================================================
+   ТАРИФЫ
+   ============================================================ */
+.pricing{padding:clamp(3rem,8vw,5rem) 0}
+.plans{display:grid;gap:1.3rem}
+.plan{
+  position:relative;background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.8rem 1.6rem;transition:.3s;display:flex;flex-direction:column;
+}
+.plan:hover{transform:translateY(-5px);border-color:var(--border-bright)}
+.plan.featured{border-color:var(--js);box-shadow:0 0 0 1px rgba(247,223,30,.25),0 26px 60px -24px rgba(247,223,30,.32)}
+.plan .ptag{font-family:var(--font-mono);font-size:.76rem;color:var(--text-faint);letter-spacing:.05em}
+.badge-pop{position:absolute;top:-12px;right:18px;background:var(--js);color:#0a0e16;font-family:var(--font-mono);font-weight:700;font-size:.7rem;padding:.35rem .7rem;border-radius:20px;letter-spacing:.03em}
+.plan h3{font-family:var(--font-display);font-weight:800;font-size:1.35rem;margin:.35rem 0 .7rem}
+.plan .price{font-family:var(--font-display);font-weight:800;font-size:2.1rem;line-height:1;margin-bottom:.2rem}
+.plan .price small{font-size:.95rem;font-weight:600;color:var(--text-faint)}
+.plan .per{font-family:var(--font-mono);font-size:.78rem;color:var(--text-faint);margin-bottom:1.3rem}
+.plan ul{display:grid;gap:.7rem;margin-bottom:1.6rem;flex:1}
+.plan li{display:flex;gap:.65rem;font-size:.92rem;color:var(--text-dim)}
+.plan li .ck{color:var(--green);flex-shrink:0;font-weight:700}
+.plan li.off{color:var(--text-faint)}
+.plan li.off .ck{color:var(--text-faint)}
+
+/* ============================================================
+   РЕГИСТРАЦИЯ
+   ============================================================ */
+.signup{padding:clamp(2rem,6vw,3.5rem) 0 clamp(3.5rem,8vw,5.5rem)}
+.signup-card{
+  background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
+  padding:clamp(1.6rem,5vw,2.6rem);position:relative;overflow:hidden;
+}
+.signup-card::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(500px 300px at 90% -20%,rgba(247,223,30,.08),transparent 60%);}
+.signup-grid{display:grid;gap:2rem;position:relative}
+.signup-info h2{font-family:var(--font-display);font-weight:800;font-size:clamp(1.5rem,4.5vw,2.2rem);line-height:1.12;margin-bottom:.7rem}
+.signup-info p{color:var(--text-dim);font-size:.98rem;margin-bottom:1.3rem}
+.signup-info .perks{display:grid;gap:.6rem}
+.signup-info .perks li{display:flex;gap:.6rem;font-size:.92rem;color:var(--text-dim)}
+.signup-info .perks li b{color:var(--js);font-family:var(--font-mono);font-weight:700}
+
+form.reg{display:grid;gap:1rem}
+.field label{display:block;font-family:var(--font-mono);font-size:.78rem;color:var(--text-dim);margin-bottom:.4rem}
+.field input{
+  width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:.85rem .95rem;color:var(--text);font-family:var(--font-body);font-size:.96rem;transition:.2s;
+}
+.field input::placeholder{color:var(--text-faint)}
+.field input:focus{outline:none;border-color:var(--js);box-shadow:0 0 0 3px rgba(247,223,30,.12)}
+.field input.invalid{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,123,114,.12)}
+.field .errmsg{display:none;color:var(--red);font-size:.78rem;margin-top:.35rem;font-family:var(--font-mono)}
+.field.show-err .errmsg{display:block}
+.field.show-err input{border-color:var(--red)}
+.form-note{font-size:.78rem;color:var(--text-faint);font-family:var(--font-mono);text-align:center}
+.form-success{
+  display:none;text-align:center;padding:1.5rem .5rem;
+}
+.form-success.show{display:block;animation:fade .4s ease}
+.form-success .big{font-size:2.4rem;margin-bottom:.6rem}
+.form-success h3{font-family:var(--font-display);font-weight:800;font-size:1.4rem;margin-bottom:.4rem}
+.form-success p{color:var(--text-dim);font-size:.95rem}
+
+/* ============================================================
+   ФУТЕР
+   ============================================================ */
+footer.site{border-top:1px solid var(--border);padding:2.8rem 0 2.2rem;background:rgba(8,11,18,.6)}
+.foot-grid{display:grid;gap:1.8rem;margin-bottom:2rem}
+.foot-brand .logo{margin-bottom:.9rem}
+.foot-brand p{color:var(--text-dim);font-size:.9rem;max-width:300px}
+.foot-col h4{font-family:var(--font-mono);font-size:.78rem;color:var(--text-faint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.9rem}
+.foot-col a{display:block;color:var(--text-dim);font-size:.92rem;padding:.3rem 0;transition:.18s}
+.foot-col a:hover{color:var(--js)}
+.socials{display:flex;gap:.7rem}
+.socials a{width:38px;height:38px;border-radius:9px;border:1px solid var(--border);display:grid;place-items:center;color:var(--text-dim);transition:.2s}
+.socials a:hover{border-color:var(--js);color:var(--js);transform:translateY(-2px)}
+.foot-bottom{border-top:1px solid var(--border);padding-top:1.5rem;display:flex;flex-wrap:wrap;gap:.6rem;justify-content:space-between;align-items:center}
+.foot-bottom p{font-family:var(--font-mono);font-size:.78rem;color:var(--text-faint)}
+
+/* ============================================================
+   АНИМАЦИИ ПОЯВЛЕНИЯ
+   ============================================================ */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  *{animation:none!important}
+  html{scroll-behavior:auto}
+}
+
+/* ============================================================
+   АДАПТИВНОСТЬ
+   ============================================================ */
+@media (min-width:640px){
+  .flow{grid-template-columns:repeat(3,1fr);gap:.6rem;position:relative}
+  .flow-arrow{display:grid;place-items:center;color:var(--text-faint);font-size:1.4rem}
+  .bullets{grid-template-columns:repeat(2,1fr)}
+  .cd-grid{gap:.8rem}
+  .plans{grid-template-columns:repeat(2,1fr)}
+}
+@media (min-width:900px){
+  .nav-links{display:flex}
+  .nav-cta{display:inline-flex}
+  .burger{display:none}
+  .hero-grid{grid-template-columns:1.05fr .95fr;gap:3rem}
+  .sb-wrap{grid-template-columns:.95fr 1.05fr;align-items:start}
+  .signup-grid{grid-template-columns:1fr 1fr;align-items:center;gap:3rem}
+  .foot-grid{grid-template-columns:1.5fr 1fr 1fr 1fr}
+  .bullets{grid-template-columns:repeat(4,1fr)}
+  .reg .row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+}
+@media (min-width:1100px){
+  .flow{gap:.9rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ============== ХЕДЕР ============== -->
+<header class="site">
+  <div class="container nav">
+    <a href="#top" class="logo">
+      <span class="logo-mark">JS</span>
+      <span>Интенсив<b>/30</b></span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#program">Программа</a>
+      <a href="#format">Преимущества</a>
+      <a href="#sandbox">Практика</a>
+      <a href="#pricing">Стоимость</a>
+    </nav>
+    <a href="#signup" class="btn btn-primary nav-cta">Записаться</a>
+    <button class="burger" id="burger" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#program">Программа</a>
+    <a href="#format">Преимущества</a>
+    <a href="#sandbox">Практика</a>
+    <a href="#pricing">Стоимость</a>
+    <a href="#signup" class="btn btn-primary btn-block">Записаться на интенсив</a>
+  </div>
+</header>
+
+<!-- ============== HERO ============== -->
+<section class="hero" id="top">
+  <div class="container hero-grid">
+    <div class="hero-text reveal">
+      <span class="eyebrow">интенсив · 4 недели · с нуля</span>
+      <h1>Освой <span class="hl">JavaScript</span> за <span class="hl2">30 дней</span>: от нуля до первого проекта</h1>
+      <p class="lead">Никакой воды. Каждый блок теории заканчивается практикой в песочнице — прочитал, закрепил кодом, пошёл дальше. Через месяц у тебя в руках работающий проект.</p>
+      <div class="hero-cta">
+        <a href="#signup" class="btn btn-primary">Начать обучение →</a>
+        <a href="#program" class="btn btn-ghost">Смотреть программу</a>
+      </div>
+      <div class="hero-meta">
+        <span><i class="dot"></i> <b>Набор открыт</b></span>
+        <span>⌁ <b>20+ задач</b> в песочнице</span>
+        <span>◷ <b>~1.5 часа</b> в день</span>
+      </div>
+
+      <!-- счётчик до старта -->
+      <div class="countdown">
+        <div class="cd-top">
+          <span class="cd-label">До старта потока осталось:</span>
+          <span class="cd-date" id="cdDate">старт 1 июля</span>
+        </div>
+        <div class="cd-grid">
+          <div class="cd-cell"><div class="cd-num" id="cdD">00</div><div class="cd-unit">дней</div></div>
+          <div class="cd-cell"><div class="cd-num" id="cdH">00</div><div class="cd-unit">часов</div></div>
+          <div class="cd-cell"><div class="cd-num" id="cdM">00</div><div class="cd-unit">минут</div></div>
+          <div class="cd-cell"><div class="cd-num" id="cdS">00</div><div class="cd-unit">секунд</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- окно редактора -->
+    <div class="editor reveal" aria-hidden="true">
+      <div class="editor-bar">
+        <span class="tl"><i></i><i></i><i></i></span>
+        <span class="editor-file"><b>~/intensiv/</b>start.js</span>
+      </div>
+      <div class="code">
+        <div class="ln">
+<span class="row"><span class="c">// добро пожаловать в JS за 30 дней</span></span><span class="row"><span class="k">const</span> student = <span class="p">{</span></span><span class="row">  name: <span class="s">"ты"</span><span class="p">,</span></span><span class="row">  level: <span class="n">0</span><span class="p">,</span></span><span class="row">  goal: <span class="s">"первый проект"</span></span><span class="row"><span class="p">};</span></span><span class="row"> </span><span class="row"><span class="k">function</span> <span class="f">learn</span><span class="p">(</span>days<span class="p">)</span> <span class="p">{</span></span><span class="row">  <span class="k">for</span> <span class="p">(</span><span class="k">let</span> d = <span class="n">1</span>; d &lt;= days; d++<span class="p">)</span> <span class="p">{</span></span><span class="row">    student.level += <span class="n">1</span>;</span><span class="row">    <span class="f">practice</span><span class="p">(</span>d<span class="p">)</span>; <span class="c">// 🔥 закрепляем</span></span><span class="row">  <span class="p">}</span></span><span class="row">  <span class="k">return</span> student.goal; <span class="c">// 🚀</span></span><span class="row"><span class="p">}</span></span><span class="row"> </span><span class="row"><span class="f">learn</span><span class="p">(</span><span class="n">30</span><span class="p">)</span>; <span class="c">// → "первый проект"</span><span class="cursor"></span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== ФОРМАТ / ПРЕИМУЩЕСТВА ============== -->
+<section class="format" id="format">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">01 — формат обучения</span>
+      <h2 class="section-title">Теория, которая сразу <span class="accent">превращается в навык</span></h2>
+      <p class="section-sub">Мы не верим в обучение, где ты неделю читаешь, а потом не можешь написать и строчки. Формат интенсива построен на одном простом цикле.</p>
+    </div>
+
+    <div class="flow reveal">
+      <div class="flow-step" data-step="0">
+        <span class="num">01</span>
+        <span class="ico">📖</span>
+        <h3>Прочитал</h3>
+        <p>Короткая теория без воды — только то, что нужно для следующего шага.</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" data-step="1">
+        <span class="num">02</span>
+        <span class="ico">⚡</span>
+        <h3>Закрепил в песочнице</h3>
+        <p>Сразу пишешь код в тренажёре прямо в браузере и видишь результат.</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" data-step="2">
+        <span class="num">03</span>
+        <span class="ico">🚀</span>
+        <h3>Перешёл дальше</h3>
+        <p>Навык закреплён — двигаешься к следующей теме без пробелов в знаниях.</p>
+      </div>
+    </div>
+
+    <div class="bullets reveal">
+      <div class="bul"><span class="bi">{ }</span><div><b>С нуля</b><span>Не нужен опыт — начинаем с самых основ.</span></div></div>
+      <div class="bul"><span class="bi">[ ]</span><div><b>Практика в браузере</b><span>Ничего не нужно устанавливать.</span></div></div>
+      <div class="bul"><span class="bi">&lt;/&gt;</span><div><b>Реальные задачи</b><span>To-Do, погода, мини-игра, скидки.</span></div></div>
+      <div class="bul"><span class="bi">=&gt;</span><div><b>Проект в портфолио</b><span>Финал — работающее приложение.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== ПРОГРАММА ============== -->
+<section class="program" id="program">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">02 — программа курса</span>
+      <h2 class="section-title">4 недели — <span class="accent">4 уровня</span> прокачки</h2>
+      <p class="section-sub">Переключай недели и раскрывай темы. В конце каждого блока — практическое задание, которое собирает всё изученное вместе.</p>
+    </div>
+
+    <!-- табы недель -->
+    <div class="tabs reveal" id="weekTabs">
+      <button class="tab active" data-tab="0"><span class="tw">Неделя 01</span><span class="tt">Основы</span></button>
+      <button class="tab" data-tab="1"><span class="tw">Неделя 02</span><span class="tt">DOM и события</span></button>
+      <button class="tab" data-tab="2"><span class="tw">Неделя 03</span><span class="tt">Async и API</span></button>
+      <button class="tab" data-tab="3"><span class="tw">Неделя 04</span><span class="tt">Продвинутое</span></button>
+    </div>
+
+    <!-- БЛОК 1 -->
+    <div class="panel active reveal" data-panel="0">
+      <div class="block-head">
+        <span class="block-badge">БЛОК 01</span>
+        <div>
+          <h3>Основы языка</h3>
+          <p>Фундамент, на котором держится всё остальное: переменные, типы данных, операторы, циклы и функции.</p>
+        </div>
+      </div>
+      <div class="acc">
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">1.1</span> Переменные и типы данных<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">let, const и var — в чём разница и что использовать. Строки, числа, boolean, null, undefined.<div class="tags"><span>let</span><span>const</span><span>typeof</span><span>String</span><span>Number</span></div></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">1.2</span> Операторы и условия<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">Арифметика, сравнения, логические операторы. Ветвление через if / else и тернарный оператор.<div class="tags"><span>if/else</span><span>&&</span><span>||</span><span>switch</span></div></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">1.3</span> Циклы<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">Повторяем действия без копипаста: for, while, перебор массивов и условия выхода из цикла.<div class="tags"><span>for</span><span>while</span><span>break</span><span>continue</span></div></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">1.4</span> Функции<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">Объявление функций, параметры и аргументы, возврат значения, стрелочные функции.<div class="tags"><span>function</span><span>return</span><span>=&gt;</span><span>params</span></div></div></div>
+        </div>
+      </div>
+      <div class="practice-card">
+        <span class="pico">🧮</span>
+        <div class="pc-body">
+          <span class="pc-tag">// ПРАКТИКА БЛОКА 1</span>
+          <h4>Функция подсчёта скидки</h4>
+          <p>Напиши функцию, которая принимает цену и процент скидки и возвращает итоговую цену. Попробуй прямо сейчас в песочнице ниже.</p>
+        </div>
+        <a href="#sandbox" class="btn btn-ghost">Открыть песочницу</a>
+      </div>
+    </div>
+
+    <!-- БЛОК 2 -->
+    <div class="panel reveal" data-panel="1">
+      <div class="block-head">
+        <span class="block-badge">БЛОК 02</span>
+        <div>
+          <h3>Работа с DOM и событиями</h3>
+          <p>Учим JavaScript «оживлять» страницу: находить элементы, менять стили и реагировать на действия пользователя.</p>
+        </div>
+      </div>
+      <div class="acc">
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">2.1</span> Поиск элементов<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">querySelector, getElementById, коллекции элементов и как с ними работать.<div class="tags"><span>querySelector</span><span>getElementById</span><span>DOM</span></div></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">2.2</span> Изменение стилей и контента<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">Меняем текст, HTML, классы и инлайн-стили. classList и работа с атрибутами.<div class="tags"><span>textContent</span><span>classList</span><span>style</span></div></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">2.3</span> Обработка кликов и ввода<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">addEventListener, объект события, клики, ввод текста, отправка форм без перезагрузки.<div class="tags"><span>addEventListener</span><span>click</span><span>input</span><span>event</span></div></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">2.4</span> Динамические элементы<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">Создаём и удаляем элементы из JS: createElement, append, remove.<div class="tags"><span>createElement</span><span>append</span><span>remove</span></div></div></div>
+        </div>
+      </div>
+      <div class="practice-card">
+        <span class="pico">✅</span>
+        <div class="pc-body">
+          <span class="pc-tag">// ПРАКТИКА БЛОКА 2</span>
+          <h4>Интерактивный список дел (To-Do)</h4>
+          <p>Собери приложение: добавление задач, отметка выполненных и удаление — всё на чистом JS и событиях.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- БЛОК 3 -->
+    <div class="panel reveal" data-panel="2">
+      <div class="block-head">
+        <span class="block-badge">БЛОК 03</span>
+        <div>
+          <h3>Асинхронный JS и API</h3>
+          <p>Разбираемся, как сайты получают данные с сервера: промисы, async/await и запросы через fetch.</p>
+        </div>
+      </div>
+      <div class="acc">
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">3.1</span> Promises<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">Что такое промис, состояния pending/fulfilled/rejected, then и catch.<div class="tags"><span>Promise</span><span>then</span><span>catch</span></div></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">3.2</span> async / await<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">Современный синтаксис для асинхронного кода, который читается как обычный. Обработка ошибок через try/catch.<div class="tags"><span>async</span><span>await</span><span>try/catch</span></div></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">3.3</span> Работа с fetch и API<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">Делаем HTTP-запросы, получаем JSON, разбираем ответ и выводим данные на страницу.<div class="tags"><span>fetch</span><span>JSON</span><span>REST API</span></div></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">3.4</span> Обработка ошибок сети<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">Что делать, если сервер недоступен: статусы ответа, индикаторы загрузки и понятные сообщения.<div class="tags"><span>status</span><span>loading</span><span>error</span></div></div></div>
+        </div>
+      </div>
+      <div class="practice-card">
+        <span class="pico">🌤️</span>
+        <div class="pc-body">
+          <span class="pc-tag">// ПРАКТИКА БЛОКА 3</span>
+          <h4>Запрос данных о погоде</h4>
+          <p>Получи погоду через публичное API и выведи температуру и описание на экран с обработкой загрузки и ошибок.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- БЛОК 4 -->
+    <div class="panel reveal" data-panel="3">
+      <div class="block-head">
+        <span class="block-badge">БЛОК 04</span>
+        <div>
+          <h3>Продвинутые темы и финал</h3>
+          <p>Темы, которые отличают новичка от уверенного джуна: классы, замыкания, модули — и сборка выпускного проекта.</p>
+        </div>
+      </div>
+      <div class="acc">
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">4.1</span> Классы и ООП<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">class, конструктор, методы, this и наследование. Когда ООП реально упрощает код.<div class="tags"><span>class</span><span>constructor</span><span>this</span><span>extends</span></div></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">4.2</span> Замыкания<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">Область видимости, лексическое окружение и почему замыкания — частый вопрос на собеседованиях.<div class="tags"><span>scope</span><span>closure</span><span>lexical</span></div></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">4.3</span> Модули<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">Разбиваем код на файлы: import / export и зачем это нужно в реальных проектах.<div class="tags"><span>import</span><span>export</span><span>modules</span></div></div></div>
+        </div>
+        <div class="acc-item">
+          <button class="acc-q"><span class="qn">4.4</span> Выпускной проект<span class="chev">▾</span></button>
+          <div class="acc-a"><div class="inner">Собираем всё вместе: структура проекта, логика, интерфейс. Результат — то, что можно показать работодателю.<div class="tags"><span>project</span><span>portfolio</span><span>деплой</span></div></div></div>
+        </div>
+      </div>
+      <div class="practice-card">
+        <span class="pico">🎮</span>
+        <div class="pc-body">
+          <span class="pc-tag">// ПРАКТИКА БЛОКА 4</span>
+          <h4>Логика для мини-игры</h4>
+          <p>Напиши игровую логику: состояние, ходы, проверка победы. Финальный шаг перед выпускным проектом.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== ПЕСОЧНИЦА ============== -->
+<section class="sandbox" id="sandbox">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">03 — интерактивная практика</span>
+      <h2 class="section-title">Песочница: <span class="accent-c">попробуй прямо сейчас</span></h2>
+      <p class="section-sub">Это настоящий тренажёр из Блока 1 — он работает прямо в браузере. Напиши функцию, нажми «Проверить код» и посмотри, пройдут ли тесты.</p>
+    </div>
+
+    <div class="sb-wrap reveal">
+      <!-- задание -->
+      <div class="sb-task">
+        <span class="pc-tag">// ЗАДАНИЕ · БЛОК 1</span>
+        <h3>Функция скидки</h3>
+        <p>Реализуй функцию <code style="color:var(--js);font-family:var(--font-mono)">discount(price, percent)</code>, которая возвращает итоговую цену после применения скидки.</p>
+        <ul class="req">
+          <li><code style="font-family:var(--font-mono);color:var(--cyan)">price</code> — изначальная цена (число)</li>
+          <li><code style="font-family:var(--font-mono);color:var(--cyan)">percent</code> — процент скидки от 0 до 100</li>
+          <li>Функция возвращает цену со скидкой</li>
+        </ul>
+        <div class="hint">💡 Подсказка: итоговая цена = price − price × percent / 100.<br>Например: <b>discount(1000, 20)</b> должно вернуть <b>800</b>.</div>
+      </div>
+
+      <!-- редактор -->
+      <div class="sb-editor">
+        <div class="editor-bar">
+          <span class="tl"><i></i><i></i><i></i></span>
+          <span class="editor-file">solution.js</span>
+        </div>
+        <textarea class="sb-code" id="sbCode" spellcheck="false" aria-label="Поле для ввода кода">function discount(price, percent) {
+  // напиши свой код здесь
+
+}</textarea>
+        <div class="sb-actions">
+          <button class="btn btn-primary" id="runBtn">▶ Проверить код</button>
+          <button class="reset" id="resetBtn">↺ Сбросить</button>
+        </div>
+        <div class="sb-out" id="sbOut">Результат проверки появится здесь...</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== ТАРИФЫ ============== -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">04 — стоимость</span>
+      <h2 class="section-title">Выбери свой <span class="accent">формат</span></h2>
+      <p class="section-sub">Одна программа — два темпа. Учись сам или с поддержкой ментора, который проверит код и ответит на вопросы.</p>
+    </div>
+
+    <div class="plans reveal">
+      <div class="plan">
+        <span class="ptag">// для самостоятельных</span>
+        <h3>Самостоятельный</h3>
+        <div class="price">29 900 <small>₸</small></div>
+        <div class="per">единоразово · доступ навсегда</div>
+        <ul>
+          <li><span class="ck">✓</span> Все 4 недели программы</li>
+          <li><span class="ck">✓</span> 20+ задач в песочнице</li>
+          <li><span class="ck">✓</span> Видео и текстовые материалы</li>
+          <li><span class="ck">✓</span> Автоматическая проверка задач</li>
+          <li><span class="ck">✓</span> Доступ к чату студентов</li>
+          <li class="off"><span class="ck">✕</span> Проверка кода ментором</li>
+          <li class="off"><span class="ck">✕</span> Разбор выпускного проекта</li>
+        </ul>
+        <a href="#signup" class="btn btn-ghost btn-block">Выбрать тариф</a>
+      </div>
+
+      <div class="plan featured">
+        <span class="badge-pop">★ ПОПУЛЯРНЫЙ</span>
+        <span class="ptag">// для тех, кто хочет результат</span>
+        <h3>С ментором</h3>
+        <div class="price">69 900 <small>₸</small></div>
+        <div class="per">единоразово · поддержка 4 недели</div>
+        <ul>
+          <li><span class="ck">✓</span> Всё из тарифа «Самостоятельный»</li>
+          <li><span class="ck">✓</span> Личный ментор-разработчик</li>
+          <li><span class="ck">✓</span> Code review твоих решений</li>
+          <li><span class="ck">✓</span> Еженедельные созвоны с группой</li>
+          <li><span class="ck">✓</span> Разбор и защита выпускного проекта</li>
+          <li><span class="ck">✓</span> Помощь с резюме и портфолио</li>
+          <li><span class="ck">✓</span> Сертификат о прохождении</li>
+        </ul>
+        <a href="#signup" class="btn btn-primary btn-block">Выбрать тариф</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== РЕГИСТРАЦИЯ ============== -->
+<section class="signup" id="signup">
+  <div class="container">
+    <div class="signup-card reveal">
+      <div class="signup-grid">
+        <div class="signup-info">
+          <span class="eyebrow">05 — запись на интенсив</span>
+          <h2>Старт уже <span class="accent">1 июля</span>. Займи место в потоке</h2>
+          <p>Оставь контакты — мы пришлём программу, ссылку на оплату и доступ к первому блоку. Никакого спама.</p>
+          <ul class="perks">
+            <li><b>›</b> Группы ограничены — до 25 человек на ментора</li>
+            <li><b>›</b> Можно начать бесплатно с демо-урока</li>
+            <li><b>›</b> Возврат средств в первые 7 дней</li>
+          </ul>
+        </div>
+
+        <div>
+          <form class="reg" id="regForm" novalidate>
+            <div class="field" id="f-name">
+              <label for="in-name">Имя</label>
+              <input type="text" id="in-name" placeholder="Как тебя зовут?" autocomplete="name">
+              <span class="errmsg">Введите имя (минимум 2 символа)</span>
+            </div>
+            <div class="field" id="f-email">
+              <label for="in-email">Email</label>
+              <input type="email" id="in-email" placeholder="you@example.com" autocomplete="email">
+              <span class="errmsg">Введите корректный email</span>
+            </div>
+            <div class="field" id="f-phone">
+              <label for="in-phone">Телефон</label>
+              <input type="tel" id="in-phone" placeholder="+7 (___) ___-__-__" autocomplete="tel">
+              <span class="errmsg">Введите корректный номер телефона</span>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Записаться на интенсив →</button>
+            <p class="form-note">Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности</p>
+          </form>
+
+          <div class="form-success" id="formSuccess">
+            <div class="big">🎉</div>
+            <h3>Заявка отправлена!</h3>
+            <p>Мы свяжемся с тобой в ближайшее время и пришлём доступ к первому блоку.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== ФУТЕР ============== -->
+<footer class="site">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#top" class="logo">
+          <span class="logo-mark">JS</span>
+          <span>Интенсив<b>/30</b></span>
+        </a>
+        <p>Интенсив «JavaScript за 1 месяц» — путь от первой переменной до работающего проекта в портфолио.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Курс</h4>
+        <a href="#program">Программа</a>
+        <a href="#format">Формат</a>
+        <a href="#sandbox">Песочница</a>
+        <a href="#pricing">Тарифы</a>
+      </div>
+      <div class="foot-col">
+        <h4>Контакты</h4>
+        <a href="mailto:hello@js-intensiv.kz">hello@js-intensiv.kz</a>
+        <a href="tel:+77000000000">+7 (700) 000-00-00</a>
+        <a href="#signup">Записаться</a>
+      </div>
+      <div class="foot-col">
+        <h4>Мы в сетях</h4>
+        <div class="socials">
+          <a href="#" aria-label="Telegram" title="Telegram">✈</a>
+          <a href="#" aria-label="Instagram" title="Instagram">◉</a>
+          <a href="#" aria-label="YouTube" title="YouTube">▷</a>
+          <a href="#" aria-label="GitHub" title="GitHub">⌥</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>© 2026 Интенсив/30 · JavaScript за 1 месяц</p>
+      <p>сделано с ❤ и console.log()</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   1. МОБИЛЬНОЕ МЕНЮ
+   ============================================================ */
+const burger = document.getElementById('burger');
+const mobileMenu = document.getElementById('mobileMenu');
+burger.addEventListener('click', () => {
+  burger.classList.toggle('open');
+  mobileMenu.classList.toggle('open');
+});
+// закрываем меню при клике по ссылке
+mobileMenu.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    burger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+  });
+});
+
+/* ============================================================
+   2. СЧЁТЧИК ДО СТАРТА
+   ============================================================ */
+(function () {
+  // дата старта потока
+  const target = new Date('2026-07-01T10:00:00');
+  const pad = n => String(n).padStart(2, '0');
+  const els = {
+    d: document.getElementById('cdD'),
+    h: document.getElementById('cdH'),
+    m: document.getElementById('cdM'),
+    s: document.getElementById('cdS'),
+    label: document.querySelector('.cd-label')
+  };
+  function tick() {
+    const diff = target - new Date();
+    if (diff <= 0) {
+      els.d.textContent = els.h.textContent = els.m.textContent = els.s.textContent = '00';
+      if (els.label) els.label.textContent = 'Поток уже стартовал — присоединяйся!';
+      return;
+    }
+    const sec = Math.floor(diff / 1000);
+    els.d.textContent = pad(Math.floor(sec / 86400));
+    els.h.textContent = pad(Math.floor((sec % 86400) / 3600));
+    els.m.textContent = pad(Math.floor((sec % 3600) / 60));
+    els.s.textContent = pad(sec % 60);
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+
+/* ============================================================
+   3. АВТО-ПОДСВЕТКА ШАГОВ ФОРМАТА
+   ============================================================ */
+(function () {
+  const steps = document.querySelectorAll('.flow-step');
+  if (!steps.length) return;
+  let i = 0;
+  function cycle() {
+    steps.forEach(s => s.classList.remove('active'));
+    steps[i].classList.add('active');
+    i = (i + 1) % steps.length;
+  }
+  cycle();
+  setInterval(cycle, 2200);
+})();
+
+/* ============================================================
+   4. ТАБЫ НЕДЕЛЬ + ПАНЕЛИ
+   ============================================================ */
+(function () {
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const idx = tab.dataset.tab;
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector('.panel[data-panel="' + idx + '"]').classList.add('active');
+    });
+  });
+})();
+
+/* ============================================================
+   5. АККОРДЕОНЫ ТЕМ
+   ============================================================ */
+document.querySelectorAll('.acc-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.closest('.acc-item');
+    const answer = item.querySelector('.acc-a');
+    const isOpen = item.classList.contains('open');
+    // закрываем все в этом же аккордеоне
+    const group = item.closest('.acc');
+    group.querySelectorAll('.acc-item').forEach(it => {
+      it.classList.remove('open');
+      it.querySelector('.acc-a').style.maxHeight = null;
+    });
+    if (!isOpen) {
+      item.classList.add('open');
+      answer.style.maxHeight = answer.scrollHeight + 'px';
+    }
+  });
+});
+
+/* ============================================================
+   6. ПЕСОЧНИЦА — ПРОВЕРКА КОДА
+   ============================================================ */
+(function () {
+  const codeEl = document.getElementById('sbCode');
+  const out = document.getElementById('sbOut');
+  const runBtn = document.getElementById('runBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const starter = 'function discount(price, percent) {\n  // напиши свой код здесь\n\n}';
+
+  // тест-кейсы: [price, percent] -> ожидаемый результат
+  const tests = [
+    { args: [1000, 20], exp: 800 },
+    { args: [500, 50], exp: 250 },
+    { args: [200, 0], exp: 200 },
+    { args: [80, 10], exp: 72 },
+    { args: [1500, 100], exp: 0 }
+  ];
+
+  function setOut(state, html) {
+    out.className = 'sb-out' + (state ? ' ' + state : '');
+    out.innerHTML = html;
+  }
+
+  function run() {
+    const code = codeEl.value;
+    let fn;
+    // 1. пробуем выполнить код и достать функцию discount
+    try {
+      fn = new Function(code + '\n; return typeof discount === "function" ? discount : null;')();
+    } catch (e) {
+      setOut('err', '<div class="ttl">✕ Ошибка в коде</div>' + escapeHtml(e.name + ': ' + e.message));
+      return;
+    }
+    if (typeof fn !== 'function') {
+      setOut('err', '<div class="ttl">✕ Функция не найдена</div>Объяви функцию с именем <b style="color:var(--js)">discount</b> — её пока нет.');
+      return;
+    }
+    // 2. прогоняем тесты
+    const results = [];
+    for (const t of tests) {
+      let got;
+      try {
+        got = fn(t.args[0], t.args[1]);
+      } catch (e) {
+        setOut('err', '<div class="ttl">✕ Ошибка при вызове</div>discount(' + t.args.join(', ') + ') → ' + escapeHtml(e.message));
+        return;
+      }
+      results.push({ args: t.args, exp: t.exp, got: got, pass: got === t.exp });
+    }
+    // 3. вывод результата
+    const passed = results.filter(r => r.pass).length;
+    const rows = results.map(r =>
+      '<div class="tcase">discount(' + r.args.join(', ') + ') → ' +
+      (r.pass ? '<b>' + r.got + ' ✓</b>' : '<i>' + format(r.got) + ' ✕</i> (ожидалось ' + r.exp + ')') +
+      '</div>'
+    ).join('');
+
+    if (passed === tests.length) {
+      setOut('ok', '<div class="ttl">✓ Все тесты пройдены (' + passed + '/' + tests.length + ')</div>' +
+        rows + '<div class="tcase" style="margin-top:.6rem;color:var(--green)">Отлично! Функция работает верно 🎉</div>');
+    } else {
+      setOut('err', '<div class="ttl">✕ Пройдено ' + passed + ' из ' + tests.length + '</div>' +
+        rows + '<div class="tcase" style="margin-top:.6rem">Подсказка: price − price × percent / 100</div>');
+    }
+  }
+
+  function format(v) {
+    if (v === undefined) return 'undefined';
+    if (v === null) return 'null';
+    if (typeof v === 'string') return '"' + v + '"';
+    return String(v);
+  }
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  }
+
+  runBtn.addEventListener('click', run);
+  resetBtn.addEventListener('click', () => {
+    codeEl.value = starter;
+    setOut('', 'Результат проверки появится здесь...');
+  });
+  // Ctrl/Cmd + Enter — быстрый запуск
+  codeEl.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); run(); }
+  });
+})();
+
+/* ============================================================
+   7. ВАЛИДАЦИЯ ФОРМЫ
+   ============================================================ */
+(function () {
+  const form = document.getElementById('regForm');
+  const success = document.getElementById('formSuccess');
+  const fields = {
+    name: { box: document.getElementById('f-name'), input: document.getElementById('in-name'),
+            test: v => v.trim().length >= 2 },
+    email: { box: document.getElementById('f-email'), input: document.getElementById('in-email'),
+             test: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) },
+    phone: { box: document.getElementById('f-phone'), input: document.getElementById('in-phone'),
+             test: v => (v.replace(/\D/g, '').length >= 10) }
+  };
+
+  function validateField(f) {
+    const ok = f.test(f.input.value);
+    f.box.classList.toggle('show-err', !ok);
+    f.input.classList.toggle('invalid', !ok);
+    return ok;
+  }
+
+  // живая проверка после первой ошибки
+  Object.values(fields).forEach(f => {
+    f.input.addEventListener('input', () => {
+      if (f.box.classList.contains('show-err')) validateField(f);
+    });
+  });
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    let allOk = true;
+    Object.values(fields).forEach(f => { if (!validateField(f)) allOk = false; });
+    if (!allOk) {
+      // фокус на первое невалидное поле
+      const firstErr = Object.values(fields).find(f => f.box.classList.contains('show-err'));
+      if (firstErr) firstErr.input.focus();
+      return;
+    }
+    // успех (бэкенда нет — показываем подтверждение)
+    form.style.display = 'none';
+    success.classList.add('show');
+  });
+})();
+
+/* ============================================================
+   8. SCROLL-REVEAL АНИМАЦИИ
+   ============================================================ */
+(function () {
+  const reveals = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) {
+    reveals.forEach(r => r.classList.add('in'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(r => io.observe(r));
+})();
+
+/* ============================================================
+   9. АКТИВНАЯ ССЫЛКА В НАВИГАЦИИ ПРИ СКРОЛЛЕ
+   ============================================================ */
+(function () {
+  const links = document.querySelectorAll('.nav-links a');
+  const map = {};
+  links.forEach(l => {
+    const id = l.getAttribute('href').slice(1);
+    const sec = document.getElementById(id);
+    if (sec) map[id] = l;
+  });
+  const sections = Object.keys(map).map(id => document.getElementById(id));
+  if (!sections.length) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(en => {
+      if (en.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const l = map[en.target.id];
+        if (l) l.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4, rootMargin: '-64px 0px -50% 0px' });
+  sections.forEach(s => io.observe(s));
+})();
+</script>
+</body>
+</html>
